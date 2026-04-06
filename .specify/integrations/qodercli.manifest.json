@@ -1,0 +1,18 @@
+{
+  "integration": "qodercli",
+  "version": "0.5.1.dev0",
+  "installed_at": "2026-04-06T12:54:56.615425+00:00",
+  "files": {
+    ".qoder/commands/speckit.analyze.md": "0dd76be34a60e3630f3eb8b54e4005035bc98d91e04566282b724453951d975d",
+    ".qoder/commands/speckit.checklist.md": "3bfb97f3286265a75f7f9321e79a3d31130a5be213013662fa2e43f22199942a",
+    ".qoder/commands/speckit.clarify.md": "0e7aeb5133272ace15629e560d394f9ea1622ca3873409b4d075c6c9f588d890",
+    ".qoder/commands/speckit.constitution.md": "89e14df67db5f8a52b8802a6e396b69d3e4badc46e97de804810aaaf439e0d5e",
+    ".qoder/commands/speckit.implement.md": "83628415c86ba487b3a083c7a2c0f016c9073abd02c1c7f4a30cff949b6602c0",
+    ".qoder/commands/speckit.plan.md": "2e000e0dc742f9674f61469690c10ef807de343e97eb88ae34dbd8ab57670ab9",
+    ".qoder/commands/speckit.specify.md": "4fe230f26eb68638d7642695ca46ed7298090e5aa692fcbe556f792511578f52",
+    ".qoder/commands/speckit.tasks.md": "a58886f29f75e1a14840007772ddd954742aafb3e03d9d1231bee033e6c1626b",
+    ".qoder/commands/speckit.taskstoissues.md": "23f5098f197d2d3512907276c466a4e03b27619721cee85361f30b21289431da",
+    ".specify/integrations/qodercli/scripts/update-context.ps1": "c66cc28c266d1b2341120abf147b7ce19dc53e5dbbaac6044b8f6f57496635b5",
+    ".specify/integrations/qodercli/scripts/update-context.sh": "b84ada76f87753aac96ec34b013d9091432d75155250b96aea3f0ba97bb7f905"
+  }
+}
