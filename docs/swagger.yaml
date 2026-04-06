@@ -1,0 +1,462 @@
+basePath: /
+definitions:
+  models.HelloResponse:
+    properties:
+      integrations:
+        additionalProperties:
+          type: string
+        type: object
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  models.IntegrationStatus:
+    properties:
+      enabled:
+        description: Whether integration is operational
+        type: boolean
+      error:
+        description: Failure reason if disabled
+        type: string
+      lastCheckTime:
+        description: When status was last updated
+        type: string
+      migrationStatus:
+        allOf:
+        - $ref: '#/definitions/models.MigrationStatus'
+        description: Schema migration status
+      name:
+        description: Integration identifier ("postgres", "redis", "mongo")
+        type: string
+    type: object
+  models.IntegrationsStatusResponse:
+    properties:
+      integrations:
+        items:
+          $ref: '#/definitions/models.IntegrationStatus'
+        type: array
+      summary:
+        $ref: '#/definitions/models.StatusSummary'
+    type: object
+  models.MigrationStatus:
+    enum:
+    - migrated
+    - failed
+    - not_configured
+    type: string
+    x-enum-varnames:
+    - MigrationStatusMigrated
+    - MigrationStatusFailed
+    - MigrationStatusNotConfigured
+  models.StatusSummary:
+    properties:
+      disabled:
+        type: integer
+      enabled:
+        type: integer
+      total:
+        type: integer
+    type: object
+  mongo.Document:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  mongo.DocumentInput:
+    properties:
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  postgres.Record:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  postgres.RecordInput:
+    properties:
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  redis.CacheItem:
+    properties:
+      data: {}
+      expires_in:
+        description: seconds
+        type: integer
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A simple Go API with optional PostgreSQL, Redis, and MongoDB integrations
+  title: Simple Go API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Check overall API health with integration statuses
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /hello:
+    get:
+      description: Guaranteed liveness probe - always available regardless of integration
+        status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.HelloResponse'
+      summary: Hello endpoint
+      tags:
+      - health
+  /integrations/status:
+    get:
+      description: Get operational status of all database integrations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.IntegrationsStatusResponse'
+      summary: Integration status
+      tags:
+      - integrations
+  /mongo/documents:
+    get:
+      description: Get all documents from MongoDB
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/mongo.Document'
+            type: array
+      summary: Get all MongoDB documents
+      tags:
+      - mongo
+    post:
+      consumes:
+      - application/json
+      description: Create a new document in MongoDB
+      parameters:
+      - description: Document data
+        in: body
+        name: document
+        required: true
+        schema:
+          $ref: '#/definitions/mongo.DocumentInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/mongo.Document'
+      summary: Create MongoDB document
+      tags:
+      - mongo
+  /mongo/documents/{id}:
+    delete:
+      description: Delete a document from MongoDB by ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete MongoDB document
+      tags:
+      - mongo
+    get:
+      description: Get a document from MongoDB by ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mongo.Document'
+      summary: Get MongoDB document by ID
+      tags:
+      - mongo
+    put:
+      consumes:
+      - application/json
+      description: Update a document in MongoDB by ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Document data
+        in: body
+        name: document
+        required: true
+        schema:
+          $ref: '#/definitions/mongo.DocumentInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mongo.Document'
+      summary: Update MongoDB document
+      tags:
+      - mongo
+  /mongo/health:
+    get:
+      description: Check MongoDB connection status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: MongoDB health check
+      tags:
+      - mongo
+  /postgres/health:
+    get:
+      description: Check PostgreSQL connection status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: PostgreSQL health check
+      tags:
+      - postgres
+  /postgres/records:
+    get:
+      description: Get all records from PostgreSQL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/postgres.Record'
+            type: array
+      summary: Get all PostgreSQL records
+      tags:
+      - postgres
+    post:
+      consumes:
+      - application/json
+      description: Create a new record in PostgreSQL
+      parameters:
+      - description: Record data
+        in: body
+        name: record
+        required: true
+        schema:
+          $ref: '#/definitions/postgres.RecordInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/postgres.Record'
+      summary: Create PostgreSQL record
+      tags:
+      - postgres
+  /postgres/records/{id}:
+    delete:
+      description: Delete a record from PostgreSQL by ID
+      parameters:
+      - description: Record ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete PostgreSQL record
+      tags:
+      - postgres
+    get:
+      description: Get a record from PostgreSQL by ID
+      parameters:
+      - description: Record ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/postgres.Record'
+      summary: Get PostgreSQL record by ID
+      tags:
+      - postgres
+    put:
+      consumes:
+      - application/json
+      description: Update a record in PostgreSQL by ID
+      parameters:
+      - description: Record ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Record data
+        in: body
+        name: record
+        required: true
+        schema:
+          $ref: '#/definitions/postgres.RecordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/postgres.Record'
+      summary: Update PostgreSQL record
+      tags:
+      - postgres
+  /redis/cache:
+    post:
+      consumes:
+      - application/json
+      description: Set a key-value pair in Redis cache
+      parameters:
+      - description: Cache item data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/redis.CacheItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Set Redis cache item
+      tags:
+      - redis
+  /redis/cache/{key}:
+    delete:
+      description: Delete a key from Redis cache
+      parameters:
+      - description: Cache key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete Redis cache item
+      tags:
+      - redis
+    get:
+      description: Get a value from Redis cache by key
+      parameters:
+      - description: Cache key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/redis.CacheItem'
+      summary: Get Redis cache item
+      tags:
+      - redis
+  /redis/health:
+    get:
+      description: Check Redis connection status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Redis health check
+      tags:
+      - redis
+swagger: "2.0"
